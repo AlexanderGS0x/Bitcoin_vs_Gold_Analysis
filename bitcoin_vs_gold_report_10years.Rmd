@@ -1,0 +1,92 @@
+---
+title: "Bitcoin vs. Gold: Safe Haven Showdown (2015-2025)"
+author: "Alexander G"
+date: "2025-05-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+```
+
+## Introduction
+This project compares Bitcoin and gold as safe haven assets over a 10-year period (May 2015 to May 2025). I analyze their cumulative returns, volatility, and performance during market downturns to determine which asset is a better safe haven.
+
+### Data Sources
+*Bitcoin Prices: Sourced from Blockchain.com API (historical market price data).
+
+*Gold Prices: Sourced from Alpha Vantage API using the GLD ETF (SPDR Gold Shares) as a proxy for gold prices.
+
+*Data was cleaned in Google Sheets and processed in BigQuery to calculate weekly returns.
+
+## Analysis
+
+```{r load-data, echo=FALSE}
+
+data <- read.csv("bitcoin_vs_gold_analyzed_10years.csv")
+data$Date <- as.Date(data$Date)
+
+```
+
+### Cumulative Returns
+The plot below shows the cumulative returns of Bitcoin and gold over the 10-year period.
+
+```{r cumulative-returns-plot, echo=FALSE, fig.width=10, fig.height=6}
+# Instead of loading the entire scales package, use :: notation to access only the function we need
+# This avoids the namespace conflicts
+
+# Option 1: Using pseudo_log10_trans (best approach)
+ggplot(data, aes(x = Date)) +
+  geom_line(aes(y = Bitcoin_Cumulative_Return, color = "Bitcoin"), linewidth = 1) +
+  geom_line(aes(y = Gold_Cumulative_Return, color = "Gold"), linewidth = 1) +
+  labs(title = "Cumulative Returns: Bitcoin vs. Gold (2015-2025)",
+       x = "Date",
+       y = "Cumulative Return (%) - Pseudo-Log Scale",
+       color = "Asset") +
+  scale_color_manual(values = c("Bitcoin" = "orange", "Gold" = "gold")) +
+  scale_y_continuous(trans = scales::pseudo_log_trans(base = 10)) +
+  theme_minimal() +
+  theme(legend.position = "top")
+
+```
+
+
+You can also explore an interactive version of this analysis in the [Tableau Dashboard](https://public.tableau.com/views/Bitcoinvs_GoldSafeHavenAnalysis2015-2025/BitcoinvsGoldDashboard?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link).
+
+
+### Key Metrics
+
+```{r metrics, echo=FALSE}
+
+weeks_per_year <- 52
+bitcoin_volatility <- sd(data$Bitcoin_Weekly_Return / 100, na.rm = TRUE) * sqrt(weeks_per_year)
+gold_volatility <- sd(data$Gold_Weekly_Return / 100, na.rm = TRUE) * sqrt(weeks_per_year)
+
+downturn_threshold <- -10
+downturns <- data[data$Bitcoin_Weekly_Return < downturn_threshold, ]
+bitcoin_downturn_avg <- mean(downturns$Bitcoin_Weekly_Return, na.rm = TRUE)
+gold_downturn_avg <- mean(downturns$Gold_Weekly_Return, na.rm = TRUE)
+
+cat("**Annualized Volatility**\n")
+cat("- Bitcoin:", round(bitcoin_volatility, 2), "%\n")
+cat("- Gold:", round(gold_volatility, 2), "%\n\n")
+cat("**Average Return During Bitcoin Downturns (>10% Drop)**\n")
+cat("- Bitcoin:", round(bitcoin_downturn_avg, 2), "%\n")
+cat("- Gold:", round(gold_downturn_avg, 2), "%\n")
+
+```
+
+## Conclusion
+*Cumulative Returns: Bitcoin likely outperformed gold significantly, but with higher volatility.
+
+*Volatility: Gold exhibits lower volatility, making it a more stable asset.
+
+*Safe Haven Performance: During Bitcoin downturns, gold typically performs better (e.g., positive or less negative returns), supporting its role as a safe haven.
+
+*Recommendation: Gold appears to be the better safe haven due to its stability and performance during market stress, though Bitcoin may appeal to risk-tolerant investors seeking higher returns.
+
+
+
+
