@@ -34,10 +34,7 @@ data$Date <- as.Date(data$Date)
 The plot below shows the cumulative returns of Bitcoin and gold over the 10-year period.
 
 ```{r cumulative-returns-plot, echo=FALSE, fig.width=10, fig.height=6}
-# Instead of loading the entire scales package, use :: notation to access only the function we need
-# This avoids the namespace conflicts
 
-# Option 1: Using pseudo_log10_trans (best approach)
 ggplot(data, aes(x = Date)) +
   geom_line(aes(y = Bitcoin_Cumulative_Return, color = "Bitcoin"), linewidth = 1) +
   geom_line(aes(y = Gold_Cumulative_Return, color = "Gold"), linewidth = 1) +
