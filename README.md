@@ -22,3 +22,15 @@ SELECT
   (Gold_Price / LAG(Gold_Price) OVER (ORDER BY Date) - 1) * 100 AS Gold_Weekly_Return
 FROM `bitcoin-vs-gold-project-10y.safe_haven_data.raw_data`
 ORDER BY Date;
+
+CREATE OR REPLACE TABLE `bitcoin-vs-gold-project-10y.safe_haven_data.processed_data_sorted` AS
+SELECT
+  Date,
+  Bitcoin_Price,
+  Gold_Price,
+  (Bitcoin_Price / LAG(Bitcoin_Price) OVER (ORDER BY Date) - 1) * 100 AS Bitcoin_Weekly_Return,
+  (Gold_Price / LAG(Gold_Price) OVER (ORDER BY Date) - 1) * 100 AS Gold_Weekly_Return
+FROM `bitcoin-vs-gold-project-10y.safe_haven_data.raw_data`
+ORDER BY Date;
+
+SELECT * FROM safe_haven_data.processed_data_sorted
